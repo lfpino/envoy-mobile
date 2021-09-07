@@ -40,6 +40,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         continue-on-error: true
         run: |
+          bazel clean --expunge
           echo "startup --client_debug" >> ~/.bazelrc
           echo "build --announce_rc" >> ~/.bazelrc
           echo "build -s" >> ~/.bazelrc
