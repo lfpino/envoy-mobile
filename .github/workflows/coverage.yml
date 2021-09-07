@@ -40,30 +40,13 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         continue-on-error: true
         run: |
-          echo "startup --client_debug" >> ~/.bazelrc
-          echo "build --announce_rc" >> ~/.bazelrc
-          echo "build -s" >> ~/.bazelrc
-          echo "build --verbose_failures" >> ~/.bazelrc
-          echo "build --sandbox_debug" >> ~/.bazelrc
           echo "build --remote_header=\"Authorization=Bearer ${{ secrets.GITHUB_TOKEN }}\"" >> ~/.bazelrc
-          echo "build --config=remote-ci-linux-clang" >> ~/.bazelrc
-          echo "build --action_env=CC=/opt/llvm/bin/clang" >> ~/.bazelrc
-          echo "build --test_env=CC=/opt/llvm/bin/clang" >> ~/.bazelrc
-          echo "build --action_env=CXX=/opt/llvm/bin/clang++" >> ~/.bazelrc
-          echo "build --test_env=CXX=/opt/llvm/bin/clang++" >> ~/.bazelrc
-          echo "build --action_env=GCOV=/opt/llvm/bin/llvm-profdata" >> ~/.bazelrc
-          echo "build --test_env=GCOV=/opt/llvm/bin/llvm-profdata" >> ~/.bazelrc
-          echo "build --action_env=BAZEL_LLVM_COV=/opt/llvm/bin/llvm-cov" >> ~/.bazelrc
-          echo "build --test_env=BAZEL_LLVM_COV=/opt/llvm/bin/llvm-cov" >> ~/.bazelrc
-          echo "build --action_env=BAZEL_USE_LLVM_NATIVE_COVERAGE=1" >> ~/.bazelrc
-          echo "build --test_env=BAZEL_USE_LLVM_NATIVE_COVERAGE=1" >> ~/.bazelrc
-          PATH=/opt/llvm/bin:${PATH} ./envoy/test/run_envoy_bazel_coverage.sh //test/common/foo:a_test
+          BAZEL_BUILD_OPTIONS="--config=remote-ci-linux-coverage" \
+            PATH=/opt/llvm/bin:${PATH} \
+            ./envoy/test/run_envoy_bazel_coverage.sh //test/common/foo:a_test
       - name: 'Package coverage'
         if: steps.check_context.outputs.run_coverage == 'true'
         run: |
-          echo ">>>>>>>>>>>Printing log..."
-          cat $(find bazel-out/ -name "test.log")
-          echo ">>>>>>>>>>>End log..."
           tar -czvf coverage.tar.gz generated/coverage
       - name: 'Upload report'
         if: steps.check_context.outputs.run_coverage == 'true'
