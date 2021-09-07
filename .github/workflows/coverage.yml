@@ -47,6 +47,9 @@ jobs:
       - name: 'Package coverage'
         if: steps.check_context.outputs.run_coverage == 'true'
         run: |
+          echo ">>>>>>>>>>>Printing log..."
+          cat $(find bazel-out/ -name "test.log")
+          echo ">>>>>>>>>>>End log..."
           tar -czvf coverage.tar.gz generated/coverage
       - name: 'Upload report'
         if: steps.check_context.outputs.run_coverage == 'true'
